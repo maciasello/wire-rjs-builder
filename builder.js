@@ -13,12 +13,13 @@
 (function(define) {
 	define( function() {
 
-		var defaultModuleRegex, defaultSpecRegex, defaultWireName, replaceIdsRegex, specCache;
+		var defaultModuleRegex, defaultSpecRegex, defaultWireName, replaceIdsRegex, isRelativeModule, specCache;
 		// default dependency regex
 		defaultWireName = 'wire';
 		defaultModuleRegex = /(\.module|\.create|\$plugins\[\])$/;
 		defaultSpecRegex = /(\.wire|\.spec)$/;
 		replaceIdsRegex = /(define)\s*\(\s*(?:\s*["']([^"']*)["']\s*,)?(?:\s*\[([^\]]*)\]\s*,)?/;
+		isRelativeModule = /^(\w+!)?\.\/(.*)/;
 		specCache = {};
 
 		// Using special require.nodeRequire, something added by r.js.
@@ -125,15 +126,22 @@
 
 				function addDependency(moduleId) {
 					var mod = moduleId;
-					if (moduleId.indexOf( './' ) === 0 ) {
+					var relativeMatch = isRelativeModule.exec(moduleId);
+
+					if (relativeMatch) {
 						// relative path, assume its relative to spec we're loading (resourceId)
 						var split = resourceId.split('/');
 						// last element is the spec name, take it out
 						split.pop();
-						// remove ./ and join two together
-						var moduleIdWithoutDotSlash = moduleId.slice(2);
+						// remove ./ (regex did that for us) and join two together
+						var moduleIdWithoutDotSlash = relativeMatch[2];
 						split.push(moduleIdWithoutDotSlash);
 						mod = split.join( '/' );
+
+						// if there was a plugin attach it at the beginning
+						if (relativeMatch[1]) {
+							mod = relativeMatch[1] + mod;
+						}
 					}
 
 					runtime_deps.push(mod);
