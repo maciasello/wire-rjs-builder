@@ -17,7 +17,7 @@
 		// default dependency regex
 		defaultWireName = 'wire';
 		defaultModuleRegex = /(\.module|\.create|\$plugins\[\])$/;
-		defaultSpecRegex = /(\.wire|\.spec)$/;
+		defaultSpecRegex = /(\.wire|\.spec|\$imports\[\])$/;
 		replaceIdsRegex = /(define)\s*\(\s*(?:\s*["']([^"']*)["']\s*,)?(?:\s*\[([^\]]*)\]\s*,)?/;
 		isRelativeModule = /^(\w+!)?\.\/(.*)/;
 		specCache = {};
